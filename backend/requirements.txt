@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+faster-whisper
+numpy
+sounddevice
+requests
+edge-tts
+playsound==1.2.2

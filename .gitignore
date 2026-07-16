@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment / secrets - API keys live in env vars, never in the repo
+.env
+.env.*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Frontend has its own .gitignore (node_modules, .next, etc.)
