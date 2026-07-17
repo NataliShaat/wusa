@@ -3,11 +3,13 @@
 Follow these steps to deploy the frontend and serverless API to Vercel.
 
 1. Ensure these environment variables are set in your Vercel project settings:
-   - `ANTHROPIC_API_KEY`
-   - `OPENAI_API_KEY`
-   - `ELEVENLABS_API_KEY`
+   - `ANTHROPIC_API_KEY` (required - NLU and Arabic speech prep)
+   - `ELEVENLABS_API_KEY` (required - TTS, and STT via Scribe)
    - `ELEVENLABS_VOICE_ID` (optional; default used if missing: `LE1b8WpPSScCUklGPKzg`)
-   - `NEXT_PUBLIC_API_BASE_URL` (leave empty for same-origin API)
+   - `OPENAI_API_KEY` (optional - Whisper STT fallback if ElevenLabs STT is unavailable)
+   - `NEXT_PUBLIC_API_BASE_URL` must NOT be set on Vercel - it would point the
+     frontend away from the bundled serverless API. It belongs only in a local
+     `.env.local` when developing against the Python FastAPI backend.
 
 2. Confirm `vercel.json` exists at repo root and `frontend` is the build target.
 
@@ -22,13 +24,13 @@ npm --prefix frontend run build
 5. If the build fails, paste the Vercel build log here and I'll patch the code.
 
 6. After a successful deploy, verify these endpoints on your deployment domain:
-   - `POST /api/session` — create session
+   - `POST /api/session` — create session (greeting and prompts as data: URLs)
    - `POST /api/turn` — send audio or `text` for STT bypass
    - `POST /api/turn/confirm` — confirm pending action
-   - `POST /api/transcribe` — transcribe audio
+   - `POST /api/transcribe` — transcribe audio (voice PIN)
    - `POST /api/payment` — initiate payment (creates pending confirm)
-   - `GET /api/state?session_id=<id>` — get account state
-   - `GET /api/audio/<token>` — stream cached TTS audio
+   - `GET /api/state` — default account state
+   (all audio is returned inline as data: URLs - there is no /api/audio route)
 
 7. Test from phone using the deployment domain (no localhost required).
 
