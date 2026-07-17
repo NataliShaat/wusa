@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/*
+ * Brand tokens derived from Alinma Bank's real live production CSS
+ * (their Feb 2025 rebrand - deep navy, lavender, copper), not a fan
+ * redesign and not their pre-2025 teal identity. No Alinma name or
+ * logo asset is used anywhere - see header wordmark in layout.tsx.
+ */
+:root {
+  --color-ink: #002134;
+  --color-ink-soft: #1e1e1e;
+  --color-primary: #837fd8;
+  --color-primary-dark: #6b66c4;
+  --color-accent: #d78e7a;
+  --color-accent-dark: #a36544;
+  --color-accent-darker: #803c1c;
+  --color-surface: #f3e4de;
+  --color-surface-soft: #fff6f4;
+  --color-success: #1e6b3a;
+  --color-success-bg: #e3f3e8;
+  --color-error: #a32020;
+  --color-error-bg: #fbe6e6;
+  /* Teal accents: used only where the reference uses teal touches (the
+     account-status pill, small highlights). Dark-on-light pairs pass 4.5:1. */
+  --color-teal: #115e59;
+  --color-teal-bg: #d3efeb;
+  /* Soft lavender fill for the promo card - dark ink text on it passes AA. */
+  --color-lavender-soft: #ecebf9;
+  --background: #ffffff;
+  --foreground: var(--color-ink);
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-accent: var(--color-accent);
+  --color-accent-dark: var(--color-accent-dark);
+  --color-accent-darker: var(--color-accent-darker);
+  --color-surface: var(--color-surface);
+  --color-surface-soft: var(--color-surface-soft);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-teal: var(--color-teal);
+  --color-teal-bg: var(--color-teal-bg);
+  --color-lavender-soft: var(--color-lavender-soft);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plex-arabic);
+  --radius-card: 12px;
+  --radius-control: 8px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@keyframes faceid-scan {
+  from { top: 12%; }
+  to { top: 82%; }
+}
+
+/* iOS-style push navigation. Layers are absolutely stacked; the incoming
+   screen slides in from the right while the covered screen shifts left
+   and dims. Transform/opacity targets are set inline by ScreenStack -
+   only the shared timing lives here. */
+.screen-layer {
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.screen-dim {
+  transition: opacity 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-layer,
+  .screen-dim {
+    transition-duration: 1ms;
+  }
+}
+
+/* When installed as a PWA the OS draws the real status bar over our
+   viewport (viewport-fit: cover), so the decorative fake one is hidden
+   and headers pad with env(safe-area-inset-top) instead. */
+@media (display-mode: standalone) {
+  .standalone-hidden {
+    display: none;
+  }
+}
+
+/* Visible focus indicator for keyboard navigation (WCAG AA) - never
+   remove the default outline without replacing it with something at
+   least as visible. */
+:focus-visible {
+  outline: 3px solid var(--color-primary-dark);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
