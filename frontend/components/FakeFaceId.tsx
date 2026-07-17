@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 
 const MIN_SCAN_MS = 1700;
 const DONE_LINGER_MS = 800;
+const MAX_FACEID_WAIT_MS = 8000;
 
 export function FakeFaceId({
   audioDone,
@@ -35,6 +36,17 @@ export function FakeFaceId({
     const t = setTimeout(onDone, DONE_LINGER_MS);
     return () => clearTimeout(t);
   }, [minScanElapsed, audioDone, verified, onDone]);
+
+  useEffect(() => {
+    if (verified) return;
+    const t = setTimeout(() => {
+      if (!verified) {
+        setVerified(true);
+        onDone();
+      }
+    }, MAX_FACEID_WAIT_MS);
+    return () => clearTimeout(t);
+  }, [verified, onDone]);
 
   return (
     <div className="flex flex-col items-center gap-4 py-2" role="status" aria-live="assertive">

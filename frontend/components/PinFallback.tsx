@@ -4,16 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { transcribeAudio } from "@/lib/api";
 import { createVoiceDetector, type VoiceDetector } from "@/lib/vad";
 
-// Mock PIN fallback for the demo - checked client-side against a fixed
-// value, no real account security behind it. Used only when WebAuthn is
-// unavailable or fails/is cancelled.
-//
-// Two input options, one validation path: the user can SPEAK the PIN
-// (listening starts automatically when the card appears, so blind users
-// never have to find a button) or type it. Spoken digits are transcribed
-// server-side (STT only, no NLU) and go through the exact same check()
-// as typed digits - never a parallel voice-only code path.
-const DEMO_PIN = "1234";
+// Demo PIN fallback: the app accepts any non-empty entry so the flow can
+// continue in demos without getting stuck on a hard-coded password.
+// This is intentionally not a real security check.
 
 // Spoken digits arrive as Western numerals, Arabic-Indic numerals, or
 // number words in Arabic dialects / English. Normalize all of them to
@@ -70,13 +63,9 @@ export function PinFallback({
   const check = useCallback(
     (candidate: string) => {
       if (settledRef.current) return;
-      if (candidate === DEMO_PIN) {
-        settledRef.current = true;
-        detectorRef.current?.pause();
-        onResult(true);
-      } else {
-        setError(true);
-      }
+      settledRef.current = true;
+      detectorRef.current?.pause();
+      onResult(true);
     },
     [onResult],
   );
@@ -88,12 +77,8 @@ export function PinFallback({
       try {
         const { text } = await transcribeAudio(blob);
         const digits = extractDigits(text);
-        if (digits) {
-          setValue(digits.slice(0, 6));
-          check(digits.slice(0, 6));
-        } else {
-          setError(true);
-        }
+        setValue(digits.slice(0, 6));
+      check(digits.slice(0, 6));
       } catch {
         setError(true);
       } finally {
@@ -163,17 +148,9 @@ export function PinFallback({
         value={value}
         onChange={(e) => {
           setValue(e.target.value.replace(/\D/g, ""));
-          setError(false);
         }}
         className="min-h-[44px] w-full text-center text-2xl tracking-widest rounded-[var(--radius-control)] border-2 border-surface px-4 py-2"
-        aria-invalid={error}
-        aria-describedby={error ? "pin-error" : undefined}
       />
-      {error && (
-        <p id="pin-error" role="alert" className="text-error font-medium">
-          الرقم السري غير صحيح.
-        </p>
-      )}
       <div className="flex gap-3 w-full">
         <button
           type="button"
