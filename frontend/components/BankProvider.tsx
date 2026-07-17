@@ -301,9 +301,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
           onSpeechStart: () => setScreenState({ type: "processing" }),
           onSpeechEnd: (blob) => void handleUtterance(blob),
         });
-      } catch {
+      } catch (err) {
+        // Surface the underlying cause: asset/hosting failures and real
+        // permission denials both land here and need different fixes.
+        console.error("voice init failed:", err);
         voiceOnRef.current = false;
-        setScreenState({ type: "error", message: "تعذر الوصول إلى المايكروفون." });
+        setScreenState({
+          type: "error",
+          message: `تعذر تشغيل الصوت. التفاصيل: ${err instanceof Error ? err.message : String(err)}`,
+        });
         return;
       }
     }

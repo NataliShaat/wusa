@@ -60,6 +60,16 @@ export async function createVoiceDetector(handlers: {
   onSpeechStart: () => void;
   onSpeechEnd: (audioBlob: Blob) => void;
 }): Promise<VoiceDetector> {
+  // Preflight the self-hosted assets first so a hosting problem (404,
+  // auth-protected deployment, missing files) produces a precise error
+  // instead of a generic "microphone can't be accessed".
+  const probe = await fetch("/vad/vad.worklet.bundle.min.js", { method: "HEAD" }).catch((e) => {
+    throw new Error(`VAD asset fetch failed: ${String(e)}`);
+  });
+  if (!probe.ok) {
+    throw new Error(`VAD assets unreachable: /vad/ returned ${probe.status}`);
+  }
+
   const vad = await MicVAD.new({
     baseAssetPath: "/vad/",
     onnxWASMBasePath: "/vad/",
