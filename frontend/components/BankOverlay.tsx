@@ -165,13 +165,17 @@ export function BankOverlay() {
                     // scan animation - blind users must know what stage
                     // the confirmation is in without seeing the screen.
                     // The animation waits for this audio to finish.
+                    const finish = () => {
+                      setFaceIdAudioDone(true);
+                      setFaceIdRunning(true);
+                    };
+
                     if (session?.faceid_audio_url) {
                       setFaceIdAudioDone(false);
-                      playPromptAudio(session.faceid_audio_url, () => setFaceIdAudioDone(true));
+                      playPromptAudio(session.faceid_audio_url, finish);
                     } else {
-                      setFaceIdAudioDone(true);
+                      finish();
                     }
-                    setFaceIdRunning(true);
                   } else {
                     void resolveConfirmation(false);
                   }

@@ -3,9 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend ci && npm --prefix frontend run build",
+    "build": "npm --prefix frontend run build",
     "start": "npm --prefix frontend run start",
-    "lint": "npm --prefix frontend run lint",
-    "postinstall": "npm --prefix frontend ci"
+    "lint": "npm --prefix frontend run lint"
   }
 }

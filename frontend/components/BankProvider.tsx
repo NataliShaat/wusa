@@ -89,6 +89,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
   const detectorRef = useRef<VoiceDetector | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sessionRef = useRef<SessionResponse | null>(null);
+  // Mirrors for the stateless serverless backend: the authoritative account
+  // state, the user's detected dialect, and any pending confirmation intent
+  // ride along on every request (the local FastAPI backend ignores them).
+  const accountStateRef = useRef<AccountState | null>(null);
+  const dialectRef = useRef<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pendingIntentRef = useRef<Record<string, any> | null>(null);
   const voiceOnRef = useRef(false);
   const sessionRequested = useRef(false);
   const turnCounter = useRef(0);
@@ -104,6 +111,7 @@ export function BankProvider({ children }: { children: ReactNode }) {
         sessionRef.current = s;
         setSession(s);
         setAccountState(s.account_state);
+        accountStateRef.current = s.account_state;
       })
       .catch(() => {
         setScreenState({ type: "error", message: "تعذر الاتصال بالخادم. تأكد من تشغيله ثم حدث الصفحة." });
@@ -175,6 +183,9 @@ export function BankProvider({ children }: { children: ReactNode }) {
     (response: TurnResponse) => {
       const id = ++turnCounter.current;
       setAccountState(response.account_state);
+      accountStateRef.current = response.account_state;
+      if (response.dialect) dialectRef.current = response.dialect;
+      pendingIntentRef.current = response.requires_confirmation ? (response.pending_intent ?? null) : null;
       setScreenState(response.screen_state);
       setLastTurn({ id, response });
 
@@ -203,7 +214,12 @@ export function BankProvider({ children }: { children: ReactNode }) {
       if (!s) return;
       setScreenState({ type: "processing" });
       try {
-        applyTurn(await sendTurn(s.session_id, blob));
+        applyTurn(
+          await sendTurn(s.session_id, blob, {
+            accountState: accountStateRef.current,
+            dialect: dialectRef.current,
+          }),
+        );
       } catch {
         failTurn();
       }
@@ -218,7 +234,13 @@ export function BankProvider({ children }: { children: ReactNode }) {
       if (!s) return;
       setScreenState({ type: "processing" });
       try {
-        applyTurn(await confirmTurn(s.session_id, confirmed));
+        applyTurn(
+          await confirmTurn(s.session_id, confirmed, {
+            accountState: accountStateRef.current,
+            dialect: dialectRef.current,
+            pendingIntent: pendingIntentRef.current,
+          }),
+        );
       } catch {
         failTurn();
       }
@@ -243,11 +265,15 @@ export function BankProvider({ children }: { children: ReactNode }) {
       setScreenState({ type: "processing" });
       try {
         applyTurn(
-          await startPayment(s.session_id, {
-            amount,
-            currency: "SAR",
-            creditorAccountNumber: beneficiary.account_number,
-          }),
+          await startPayment(
+            s.session_id,
+            {
+              amount,
+              currency: "SAR",
+              creditorAccountNumber: beneficiary.account_number,
+            },
+            { accountState: accountStateRef.current, dialect: dialectRef.current },
+          ),
         );
       } catch {
         failTurn();

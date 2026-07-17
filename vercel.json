@@ -1,10 +1,5 @@
 {
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "installCommand": "npm --prefix frontend ci",
+  "version": 3,
+  "installCommand": "npm install --prefix frontend",
   "buildCommand": "npm --prefix frontend run build"
 }
