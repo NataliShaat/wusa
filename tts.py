@@ -33,9 +33,10 @@ import tempfile
 import asyncio
 import requests  # type: ignore
 import edge_tts  # type: ignore
-from playsound import playsound  # type: ignore
 
-# -- Config ---------------------------------------------------------------
+# playsound is only required for local terminal playback, not server-side
+# backend requests. Import lazily in speak() so the Railway container can
+# skip audio output dependencies unless that code path is actually used.
 
 ANTHROPIC_KEY   = os.getenv("ANTHROPIC_API_KEY", "").strip()
 # Haiku 4.5: rephrasing + diacritization is a mechanical text transform that
@@ -246,6 +247,13 @@ def speak(text: str, language: str = DEFAULT_LANGUAGE, dialect: str = None):
     This is what the Action Protocol's response message gets handed to."""
     if not text:
         return
+
+    try:
+        from playsound import playsound  # type: ignore
+    except Exception:
+        print("playsound unavailable; speaking output will not be played.")
+        return
+
     print(f"Speaking ({language}): {text}")
     out_path = synthesize_to_file(text, language, dialect)
     try:
