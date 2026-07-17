@@ -154,7 +154,7 @@ async def _run_tts_background(token: str, text: str, language: str, dialect: str
 
 
 async def _tts_url(text: str, language: str, dialect: str = None) -> str:
-    """Best-effort TTS: returns an audio URL token immediately."""
+    """Best-effort TTS: returns an audio URL token immediately."
     token = _register_pending_audio()
     asyncio.create_task(_run_tts_background(token, text, language, dialect))
     return f"/api/audio/{token}"

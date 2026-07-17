@@ -75,6 +75,12 @@ export type TurnResponse = {
   spoken_text: string;
   audio_url: string;
   account_state: AccountState;
+  // Present on the stateless (Vercel) backend only: the detected dialect and
+  // the pending intent the client must echo back on /api/turn/confirm. The
+  // local FastAPI backend keeps both server-side and omits these fields.
+  dialect?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  pending_intent?: Record<string, any> | null;
 };
 
 export type SessionResponse = {

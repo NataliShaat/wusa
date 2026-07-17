@@ -32,5 +32,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Required Vercel environment variables
 
+Set the following values in your Vercel project environment settings:
+
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY`
+- `ELEVENLABS_API_KEY`
+- `ELEVENLABS_VOICE_ID` (default: `LE1b8WpPSScCUklGPKzg`)
+
+If you deploy the frontend and backend together on Vercel, you do not need `NEXT_PUBLIC_API_BASE_URL` unless you want to route the frontend to an external backend host.
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Explicit Turbopack root to avoid workspace-root inference warnings
+  turbopack: { root: "./" },
 };
 
 export default nextConfig;
