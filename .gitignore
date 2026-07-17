@@ -13,3 +13,4 @@ Thumbs.db
 .DS_Store
 
 # Frontend has its own .gitignore (node_modules, .next, etc.)
+
