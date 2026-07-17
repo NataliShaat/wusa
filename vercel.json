@@ -1,5 +1,10 @@
 {
-  "buildCommand": "npm --prefix frontend run build",
-  "installCommand": "npm install && npm --prefix frontend ci",
-  "outputDirectory": "frontend/.next"
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "installCommand": "npm --prefix frontend ci",
+  "buildCommand": "npm --prefix frontend run build"
 }
